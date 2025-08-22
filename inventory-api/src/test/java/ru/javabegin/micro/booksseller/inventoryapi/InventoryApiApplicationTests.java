@@ -1,10 +1,10 @@
-package ru.javabegin.micro.booksseller.catalogapi;
+package ru.javabegin.micro.booksseller.inventoryapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CatalogApiApplicationTests {
+class InventoryApiApplicationTests {
 
     @Test
     void contextLoads() {

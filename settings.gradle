@@ -3,3 +3,4 @@ rootProject.name = 'BookSSelleR'
 
 includeBuild 'eureka-server'
 includeBuild 'catalog-api'
+includeBuild 'gateway-api'
