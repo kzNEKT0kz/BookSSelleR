@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "name": "CategoryCreatedEvent",
+  "namespace": "com.smart.library.eventschemas.avro",
+  "fields": [
+    {"name": "id", "type": "long"},
+    {"name": "categoryName", "type": "string"}
+  ]
+}

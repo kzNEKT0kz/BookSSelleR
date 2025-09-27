@@ -45,8 +45,6 @@ public class Book {
 
     private String  series;
 
-    // getters & setters
-
 
     public String getId() {
         return id;
