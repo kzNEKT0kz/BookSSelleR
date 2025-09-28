@@ -1,5 +1,7 @@
 package ru.javabegin.micro.booksseller.catalogapi.Services;
 
+
+import com.smart.library.eventschemas.avro.CategoryCreatedEvent;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 import ru.javabegin.micro.booksseller.catalogapi.Entities.Category;
 import ru.javabegin.micro.booksseller.catalogapi.Repositories.CategoryRepository;
 
-import com.smart.library.eventschemas.avro.CategoryCreatedEvent;
 
 @Service
 public class CategoryService {
@@ -18,7 +19,6 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final KafkaTemplate<String, CategoryCreatedEvent> kafkaTemplate;
-
     public CategoryService(CategoryRepository categoryRepository,
                            KafkaTemplate<String, CategoryCreatedEvent> kafkaTemplate) {
         this.categoryRepository = categoryRepository;
