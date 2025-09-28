@@ -26,19 +26,20 @@ services:
     ports:
       - "8081:8081"
     environment:
-
-      KARAPACE_KAFKA_BROKERS: kafka:19092
-      KARAPACE_ADVERTISED_HOSTNAME: schema-registry
-      KARAPACE_HOST: 0.0.0.0
-      KARAPACE_PORT: 8081
-
-      KARAPACE_MASTER_ELIGIBILITY: "true"
-      KARAPACE_COMPATIBILITY: "forward"
-
+      - KARAPACE_BOOTSTRAP_URI=kafka:19092
+      - KARAPACE_ADVERTISED_HOSTNAME=schema-registry
+      - KARAPACE_HOST=0.0.0.0
+      - KARAPACE_PORT=8081
+      - KARAPACE_MASTER_ELIGIBILITY=true
+      - KARAPACE_COMPATIBILITY=forward
+      - KARAPACE_CLIENT_ID=schema-registry
+      - KARAPACE_GROUP_ID=schema-registry
+      - KARAPACE_TOPIC_NAME=_schemas
     entrypoint:
       - python3
       - -m
       - karapace
+
 
 volumes:
   kafka-data:

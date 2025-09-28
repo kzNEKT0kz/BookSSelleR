@@ -13,11 +13,11 @@ public class Category {
     private Long id;
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id")
     private Category parent;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Category> subcategory = new ArrayList<Category>();
 
     public Category() {

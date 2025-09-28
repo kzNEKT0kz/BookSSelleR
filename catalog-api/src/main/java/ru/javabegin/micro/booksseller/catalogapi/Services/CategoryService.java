@@ -36,6 +36,16 @@ public class CategoryService {
             throw new IllegalStateException("Category with name " + category.getName() + " already exists");
         }
 
+        if (category.getName() == null || category.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Category name cannot be null or empty");
+        }
+
+        if (categoryRepository.findByName(category.getName()).isPresent()) {
+            throw new IllegalStateException("Category with name " + category.getName() + " already exists");
+        }
+
+
+
         Category savedCategory = categoryRepository.save(category);
 
         CategoryCreatedEvent event = CategoryCreatedEvent.newBuilder()
