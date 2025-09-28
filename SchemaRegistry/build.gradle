@@ -24,6 +24,17 @@ repositories {
     }
 }
 
+
+avro {
+    stringType = "String"
+    fieldVisibility = "PRIVATE"
+}
+
+tasks.named("generateAvroJava").configure {
+    outputDir = file("src/main/java")   // 👉 здесь указываем куда класть .java
+}
+
+
 ext {
     set('springCloudVersion', "2025.0.0")
 }
