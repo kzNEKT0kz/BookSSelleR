@@ -2,6 +2,7 @@ package ru.javabegin.micro.booksseller.inventoryapi.Services;
 
 import org.springframework.stereotype.Service;
 import ru.javabegin.micro.booksseller.inventoryapi.Collections.Book;
+import ru.javabegin.micro.booksseller.inventoryapi.Repository.CategoryRepository;
 import ru.javabegin.micro.booksseller.inventoryapi.Repository.InventoryRepository;
 
 import java.util.List;
@@ -10,14 +11,22 @@ import java.util.List;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    public InventoryService(InventoryRepository inventoryRepository) {
+    public InventoryService(InventoryRepository inventoryRepository , CategoryRepository categoryRepository) {
         this.inventoryRepository = inventoryRepository;
+        this.categoryRepository = categoryRepository;
     }
 
-    public Book addBook(Book book) {
+    public void addBook(Book book) {
 
-        return inventoryRepository.save(book);
+        if(!CheckExistCategory(book.getGenre())){
+
+             throw new  IllegalArgumentException("Genre does not exist");
+        }
+
+         inventoryRepository.save(book);
+
     }
 
     public void removeBook(String id) {
@@ -45,6 +54,15 @@ public class InventoryService {
 
     public List<Book> getAllBooks() {
         return inventoryRepository.findAll();
+    }
+
+
+    public boolean CheckExistCategory(String category) {
+
+        if(categoryRepository.findByName(category)){
+            return true;
+        }
+        return false;
     }
 
 }

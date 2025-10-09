@@ -5,6 +5,7 @@ includeBuild 'eureka-server'
 
 includeBuild 'catalog-api'
 includeBuild 'inventory-api'
+includeBuild 'auth-api'
 
 includeBuild 'gateway-api'
 

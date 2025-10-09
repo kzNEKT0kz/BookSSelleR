@@ -17,8 +17,8 @@ public class InventoryController {
     }
 
     @PostMapping(path = "/addBook")
-    public Book addBook(@RequestBody Book book) {
-        return inventoryService.addBook(book);
+    public void addBook(@RequestBody Book book) {
+         inventoryService.addBook(book);
     }
 
     @DeleteMapping(path = "/removeBook/{id}")
