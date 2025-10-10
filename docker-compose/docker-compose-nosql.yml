@@ -10,11 +10,58 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    volumes:
+      - redis-data:/data
+    networks:
+      - nosql-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false     # отключаем авторизацию
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g       # настройки JVM
+    ports:
+      - "9200:9200"                      # API Elasticsearch
+      - "9300:9300"                      # внутренний кластерный порт
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+    networks:
+      - nosql-net
+
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.3
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana
+      - XPACK_SECURITY_ENABLED=false     # отключаем авторизацию
+    ports:
+      - "5601:5601"                      # веб-интерфейс Kibana
+    depends_on:
+      - elasticsearch
+    networks:
+      - nosql-net
+
+
 
 
 
 volumes:
   mongo-data:
+  redis-data:
+  elastic-data:
 
-
+# --- Network ---
+networks:
+  nosql-net:
+    driver: bridge
 
