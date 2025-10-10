@@ -1,6 +1,7 @@
-package ru.javabegin.micro.booksseller.authapi.Security;
+package ru.javabegin.micro.booksseller.gatewayapi.Security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class GlobalAuthFilter implements GlobalFilter, Ordered {
@@ -42,39 +44,38 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
         String token = authHeader.substring(7);
 
         try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtSecret.getBytes())
+            // Исправленная версия парсера для jjwt 0.12.3
+            Jws<Claims> claimsJws = Jwts.parser()
+                    .setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .parseClaimsJws(token);
 
+            Claims claims = claimsJws.getBody();
             String username = claims.getSubject();
             String role = String.valueOf(claims.get("role"));
 
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                    .header("X-Role", role).build();
+                    .header("X-User-Name", username)
+                    .header("X-Role", role)
+                    .build();
 
-            ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
+            return chain.filter(exchange.mutate().request(mutatedRequest).build());
 
-            return chain.filter(mutatedExchange);
-
-        }
-        catch (JwtException | IllegalArgumentException e){
+        } catch (JwtException | IllegalArgumentException e) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
     }
 
-
     private boolean isPublicEndpoint(String path) {
-        return path.startsWith("/auth") // эндпоинты регистрации/логина
+        return path.startsWith("/auth")
                 || path.startsWith("/swagger")
-                || path.startsWith("/v3/api-docs");
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/eureka"); // добавьте если нужно
     }
 
     @Override
     public int getOrder() {
-        return -1;
+        return Ordered.LOWEST_PRECEDENCE;
     }
-
 }
