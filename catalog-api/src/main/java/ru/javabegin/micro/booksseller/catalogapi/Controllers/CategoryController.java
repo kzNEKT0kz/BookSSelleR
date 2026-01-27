@@ -12,8 +12,8 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService) { this.categoryService = categoryService; }
 
     @PostMapping(path = "/addCatalog")
-    public void create(@RequestBody Category category) {
-         categoryService.create(category);
+    public void create(@RequestBody Category category){
+        categoryService.create(category);
     }
 
     @DeleteMapping(path = "/deleteCatalog/{id}")

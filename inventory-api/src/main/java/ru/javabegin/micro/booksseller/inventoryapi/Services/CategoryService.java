@@ -1,7 +1,7 @@
 package ru.javabegin.micro.booksseller.inventoryapi.Services;
 
 import org.springframework.stereotype.Service;
-import ru.javabegin.micro.booksseller.inventoryapi.Collections.Category;
+import ru.javabegin.micro.booksseller.inventoryapi.Domain.Category;
 import ru.javabegin.micro.booksseller.inventoryapi.Repository.CategoryRepository;
 
 @Service

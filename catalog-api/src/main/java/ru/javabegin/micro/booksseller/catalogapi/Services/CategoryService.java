@@ -19,6 +19,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final KafkaTemplate<String, CategoryCreatedEvent> kafkaTemplate;
+
     public CategoryService(CategoryRepository categoryRepository,
                            KafkaTemplate<String, CategoryCreatedEvent> kafkaTemplate) {
         this.categoryRepository = categoryRepository;
@@ -39,12 +40,6 @@ public class CategoryService {
         if (category.getName() == null || category.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Category name cannot be null or empty");
         }
-
-        if (categoryRepository.findByName(category.getName()).isPresent()) {
-            throw new IllegalStateException("Category with name " + category.getName() + " already exists");
-        }
-
-
 
         Category savedCategory = categoryRepository.save(category);
 

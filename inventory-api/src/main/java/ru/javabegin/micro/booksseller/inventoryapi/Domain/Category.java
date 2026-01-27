@@ -1,4 +1,4 @@
-package ru.javabegin.micro.booksseller.inventoryapi.Collections;
+package ru.javabegin.micro.booksseller.inventoryapi.Domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

@@ -1,7 +1,7 @@
 package ru.javabegin.micro.booksseller.inventoryapi.Controllers;
 
 import org.springframework.web.bind.annotation.*;
-import ru.javabegin.micro.booksseller.inventoryapi.Collections.Book;
+import ru.javabegin.micro.booksseller.inventoryapi.Domain.Book;
 import ru.javabegin.micro.booksseller.inventoryapi.Services.InventoryService;
 
 import java.util.List;

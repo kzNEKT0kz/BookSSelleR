@@ -39,9 +39,10 @@ public class AuthService {
         admin.setEmail(request.getEmail());
         admin.setPassword(passwordEncoder.encode(request.getPassword()));
         admin.setName(request.getName());
-        admin.setRole_name(request.getRole_name());
+        admin.setRole_name("ROLE_ADMIN");
 
         adminRepository.save(admin);
+        request.setRole_name("ROLE_ADMIN");
         return register(request, admin.getId());
     }
 
@@ -73,23 +74,47 @@ public class AuthService {
 
     public AuthorizationResponse loginAdmin(AuthorizationRequest request) {
         Optional<Admin> admin = adminRepository.findByEmail(request.getEmail());
-        if(admin.isEmpty()){
+        if (admin.isEmpty()) {
             throw new IllegalArgumentException("Admin not found");
         }
-        return login(request,admin.get().getPassword(),request.getRole_name());
+
+        // Берем роль из сущности Admin
+        String encodedPassword = admin.get().getPassword();
+        String roleName = admin.get().getRole_name(); // ✅ здесь есть "ROLE_ADMIN"
+
+        if (!passwordEncoder.matches(request.getPassword(), encodedPassword)) {
+            throw new IllegalArgumentException("Invalid password");
+        }
+
+        String token = jwtTokenProvider.generateToken(request.getEmail(), roleName);
+        return new AuthorizationResponse(token);
     }
+
 
     public AuthorizationResponse loginUser(AuthorizationRequest request) {
         Optional<User> user = userRepository.findByEmail(request.getEmail());
-        if(user.isEmpty()){
+        if (user.isEmpty()) {
             throw new IllegalArgumentException("User not found");
         }
-        return login(request,user.get().getPassword(),request.getRole_name());
+
+        // Берем роль из таблицы Role, где entity_id = user.id
+        String roleName = roleRepository.findEntityById(user.get().getId())
+                .map(Role::getRole)
+                .orElse("ROLE_USER");
+
+        String encodedPassword = user.get().getPassword();
+        if (!passwordEncoder.matches(request.getPassword(), encodedPassword)) {
+            throw new IllegalArgumentException("Invalid password");
+        }
+
+        String token = jwtTokenProvider.generateToken(request.getEmail(), roleName);
+        return new AuthorizationResponse(token);
     }
 
 
+
     private AuthorizationResponse login(AuthorizationRequest request, String password, String role_name) {
-        if(!passwordEncoder.matches(password, request.getPassword())){
+        if(!passwordEncoder.matches(request.getPassword(), password)){
             return new AuthorizationResponse("Invalid password");
         }
 

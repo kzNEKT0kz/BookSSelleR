@@ -1,4 +1,4 @@
-package ru.javabegin.micro.booksseller.inventoryapi.Collections;
+package ru.javabegin.micro.booksseller.inventoryapi.Domain;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
@@ -181,4 +181,6 @@ public class Book {
     public void setSeries(String series) {
         this.series = series;
     }
+
+
 }

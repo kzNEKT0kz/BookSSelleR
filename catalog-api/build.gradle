@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     implementation 'ru.javabegin.micro.BookSSelleR:SchemaRegistry:0.0.1-SNAPSHOT'
     implementation 'org.springframework.kafka:spring-kafka'

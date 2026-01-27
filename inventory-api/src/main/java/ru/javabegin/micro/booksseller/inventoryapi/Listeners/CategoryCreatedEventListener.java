@@ -4,7 +4,7 @@ import com.smart.library.eventschemas.avro.CategoryCreatedEvent;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import ru.javabegin.micro.booksseller.inventoryapi.Collections.Category;
+import ru.javabegin.micro.booksseller.inventoryapi.Domain.Category;
 import ru.javabegin.micro.booksseller.inventoryapi.Services.CategoryService;
 
 @Component
