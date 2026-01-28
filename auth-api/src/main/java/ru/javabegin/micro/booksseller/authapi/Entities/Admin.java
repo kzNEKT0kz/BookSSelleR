@@ -1,3 +1,4 @@
+// Admin.java
 package ru.javabegin.micro.booksseller.authapi.Entities;
 
 import jakarta.persistence.*;
@@ -8,21 +9,34 @@ public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String password;
     private String email;
-    private String role_name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role = Role.ROLE_ADMIN;
+
+    @Column(name = "provider")
+    private String provider; // LOCAL
+
+    public enum Role {
+        ROLE_ADMIN,
+        ROLE_SUPER_ADMIN,
+        ROLE_MODERATOR
+    }
 
     public Admin() {
     }
 
-    public Admin(Long id, String name, String password, String email, String role_name) {
+    public Admin(Long id, String name, String password, String email, Role role, String provider) {
         this.id = id;
         this.name = name;
         this.password = password;
         this.email = email;
-        this.role_name = role_name;
+        this.role = role;
+        this.provider = provider;
     }
 
     public Long getId() {
@@ -57,12 +71,20 @@ public class Admin {
         this.email = email;
     }
 
-    public String getRole_name() {
-        return role_name;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRole_name(String role_name) {
-        this.role_name = role_name;
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     @Override
@@ -72,7 +94,10 @@ public class Admin {
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
-                ", role_name='" + role_name + '\'' +
+                ", role=" + role +
+                ", provider='" + provider + '\'' +
                 '}';
     }
+
+
 }

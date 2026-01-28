@@ -1,7 +1,7 @@
+// User.java
 package ru.javabegin.micro.booksseller.authapi.Entities;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 @Entity
@@ -10,6 +10,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String email;
     private String password;
@@ -17,10 +18,29 @@ public class User {
     private Integer age;
     private Float total_spend_amount;
 
+    @Column(name = "provider")
+    private String provider; // LOCAL, GOOGLE, GITHUB
+
+    @Column(name = "provider_id")
+    private String providerId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role = Role.ROLE_USER;
+
+    public enum Role {
+        ROLE_USER,
+        ROLE_PREMIUM_USER,
+        ROLE_VIP_USER
+    }
+
+
+
+
     public User() {
     }
 
-    public User(Long id, String name, String email, String password, LocalDate birth, Integer age, Float total_spend_amount) {
+    public User(Long id, String name, String email, String password, LocalDate birth, Integer age, Float total_spend_amount, String provider, String providerId, Role role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -28,6 +48,9 @@ public class User {
         this.birth = birth;
         this.age = age;
         this.total_spend_amount = total_spend_amount;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.role = role;
     }
 
     public Long getId() {
@@ -86,6 +109,30 @@ public class User {
         this.total_spend_amount = total_spend_amount;
     }
 
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public String getProviderId() {
+        return providerId;
+    }
+
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -96,6 +143,11 @@ public class User {
                 ", birth=" + birth +
                 ", age=" + age +
                 ", total_spend_amount=" + total_spend_amount +
+                ", provider='" + provider + '\'' +
+                ", providerId='" + providerId + '\'' +
+                ", role=" + role +
                 '}';
     }
+
+
 }

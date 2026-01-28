@@ -1,7 +1,6 @@
 package ru.javabegin.micro.booksseller.authapi.Security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -9,6 +8,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -19,10 +20,14 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, String role, String userType) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.put("userType", userType); // "USER" или "ADMIN"
+
         return Jwts.builder()
                 .subject(email)
-                .claim("role", role)
+                .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
@@ -41,6 +46,10 @@ public class JwtTokenProvider {
         return getAllClaimsFromToken(token).get("role", String.class);
     }
 
+    public String getUserTypeFromToken(String token) {
+        return getAllClaimsFromToken(token).get("userType", String.class);
+    }
+
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -56,7 +65,7 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }
