@@ -35,7 +35,7 @@ public class AuthService {
 
     @Transactional
     public AuthorizationResponse registerAdmin(RegistrationRequest request) {
-        // Проверяем, нет ли уже админа с таким email
+
         if (adminRepository.findByEmail(request.getEmail()).isPresent() ||
                 userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
@@ -68,7 +68,7 @@ public class AuthService {
 
     @Transactional
     public AuthorizationResponse registerUser(RegistrationRequest request) {
-        // Проверяем, нет ли уже пользователя с таким email
+
         if (userRepository.findByEmail(request.getEmail()).isPresent() ||
                 adminRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
@@ -87,7 +87,7 @@ public class AuthService {
             try {
                 user.setRole(User.Role.valueOf(request.getRole_name()));
             } catch (IllegalArgumentException e) {
-                user.setRole(User.Role.ROLE_USER); // По умолчанию
+                user.setRole(User.Role.ROLE_USER);
             }
         }
 
@@ -131,7 +131,7 @@ public class AuthService {
 
         User user = userOpt.get();
 
-        // Проверяем пароль только для LOCAL пользователей
+
         if ("LOCAL".equals(user.getProvider()) &&
                 !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
@@ -146,16 +146,16 @@ public class AuthService {
         return new AuthorizationResponse(token);
     }
 
-    // Метод для создания OAuth пользователя
+
     public User createOAuthUser(String email, String name, String provider, Map<String, Object> attributes) {
         User user = new User();
         user.setEmail(email);
         user.setName(name);
         user.setProvider(provider.toUpperCase());
         user.setProviderId(getProviderId(provider, attributes));
-        // OAuth пользователям не нужен пароль
+
         user.setPassword(null);
-        user.setRole(User.Role.ROLE_USER); // По умолчанию
+        user.setRole(User.Role.ROLE_USER);
 
         return userRepository.save(user);
     }
@@ -169,11 +169,8 @@ public class AuthService {
         return null;
     }
 
-    // ==== НОВЫЕ МЕТОДЫ ДЛЯ OAUTH ====
 
-    /**
-     * Находит или создает пользователя через OAuth2
-     */
+
     public Optional<User> findOrCreateOAuthUser(String provider, Map<String, Object> attributes) {
         String email = getEmailFromOAuthAttributes(provider, attributes);
 
@@ -184,20 +181,18 @@ public class AuthService {
         Optional<User> existingUser = userRepository.findByEmail(email);
 
         if (existingUser.isPresent()) {
-            // Обновляем информацию существующего пользователя
+
             User user = existingUser.get();
             updateUserFromOAuth(user, provider, attributes);
             return Optional.of(userRepository.save(user));
         } else {
-            // Создаем нового пользователя через OAuth
+
             User newUser = createUserFromOAuth(provider, attributes);
             return Optional.of(userRepository.save(newUser));
         }
     }
 
-    /**
-     * Создает нового пользователя из OAuth2 данных
-     */
+
     public User createUserFromOAuth(String provider, Map<String, Object> attributes) {
         String email = getEmailFromOAuthAttributes(provider, attributes);
         String name = getNameFromOAuthAttributes(provider, attributes);
@@ -213,18 +208,14 @@ public class AuthService {
         return user;
     }
 
-    /**
-     * Обновляет существующего пользователя данными из OAuth2
-     */
+
     public void updateUserFromOAuth(User user, String provider, Map<String, Object> attributes) {
         user.setName(getNameFromOAuthAttributes(provider, attributes));
         user.setProvider(provider.toUpperCase());
         user.setProviderId(getProviderIdFromOAuth(provider, attributes));
     }
 
-    /**
-     * Получает email из атрибутов OAuth2 провайдера
-     */
+
     private String getEmailFromOAuthAttributes(String provider, Map<String, Object> attributes) {
         if ("google".equals(provider)) {
             return (String) attributes.get("email");
@@ -239,9 +230,7 @@ public class AuthService {
         return null;
     }
 
-    /**
-     * Получает имя из атрибутов OAuth2 провайдера
-     */
+
     private String getNameFromOAuthAttributes(String provider, Map<String, Object> attributes) {
         if ("google".equals(provider)) {
             return (String) attributes.get("name");
@@ -251,9 +240,7 @@ public class AuthService {
         return null;
     }
 
-    /**
-     * Получает providerId из атрибутов OAuth2 провайдера
-     */
+
     private String getProviderIdFromOAuth(String provider, Map<String, Object> attributes) {
         if ("google".equals(provider)) {
             return (String) attributes.get("sub");
@@ -263,16 +250,12 @@ public class AuthService {
         return null;
     }
 
-    /**
-     * Находит пользователя по email
-     */
+
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    /**
-     * Находит админа по email
-     */
+
     public Optional<Admin> findAdminByEmail(String email) {
         return adminRepository.findByEmail(email);
     }

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final AuthService authService; // Используем AuthService вместо UserService
+    private final AuthService authService;
 
     public CustomOAuth2UserService(AuthService authService) {
         this.authService = authService;
@@ -26,11 +26,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String provider = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        // Используем AuthService для обработки OAuth пользователя
+
         Optional<User> user = authService.findOrCreateOAuthUser(provider, attributes);
 
-        // Возвращаем стандартного OAuth2User
-        // В реальности можно создать CustomOAuth2User, но для простоты возвращаем стандартного
+
         return oAuth2User;
     }
 }

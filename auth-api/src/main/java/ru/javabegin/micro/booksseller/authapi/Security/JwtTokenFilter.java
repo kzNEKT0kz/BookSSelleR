@@ -36,7 +36,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 String role = jwtTokenProvider.getRoleFromToken(token);
                 String userType = jwtTokenProvider.getUserTypeFromToken(token);
 
-                // Создаем аутентификацию с ролью из токена
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 email,
@@ -44,7 +43,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                 List.of(new SimpleGrantedAuthority(role))
                         );
 
-                // Добавляем дополнительную информацию
                 authentication.setDetails(userType);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

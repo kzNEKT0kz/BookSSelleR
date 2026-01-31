@@ -46,7 +46,7 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
 
-                // OAuth2 конфигурация
+
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
@@ -54,12 +54,11 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                // Отключаем форму логина Spring Security
+
                 .formLogin(form -> form.disable())
 
-                // Добавляем JWT фильтр
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

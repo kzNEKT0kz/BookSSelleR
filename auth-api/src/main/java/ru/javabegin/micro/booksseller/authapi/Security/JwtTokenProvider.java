@@ -23,7 +23,7 @@ public class JwtTokenProvider {
     public String generateToken(String email, String role, String userType) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
-        claims.put("userType", userType); // "USER" или "ADMIN"
+        claims.put("userType", userType);
 
         return Jwts.builder()
                 .subject(email)

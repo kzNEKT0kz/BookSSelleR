@@ -1,4 +1,4 @@
-// Admin.java
+
 package ru.javabegin.micro.booksseller.authapi.Entities;
 
 import jakarta.persistence.*;

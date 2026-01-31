@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import ru.javabegin.micro.booksseller.authapi.Entities.User;
-import ru.javabegin.micro.booksseller.authapi.Services.AuthService; // Используем AuthService
+import ru.javabegin.micro.booksseller.authapi.Services.AuthService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService; // Используем AuthService вместо UserService
+    private final AuthService authService;
     private final ObjectMapper objectMapper;
 
     public OAuth2SuccessHandler(JwtTokenProvider jwtTokenProvider,
@@ -42,18 +42,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String provider = oauthToken.getAuthorizedClientRegistrationId();
         Map<String, Object> attributes = oauthUser.getAttributes();
 
-        // Используем AuthService для поиска/создания пользователя
         Optional<User> user = authService.findOrCreateOAuthUser(provider, attributes);
 
         if (user.isPresent()) {
-            // Генерируем JWT токен
             String token = jwtTokenProvider.generateToken(
                     user.get().getEmail(),
                     user.get().getRole().name(),
                     "USER"
             );
 
-            // Возвращаем токен как JSON
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
