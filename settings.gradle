@@ -7,6 +7,8 @@ includeBuild 'catalog-api'
 includeBuild 'inventory-api'
 includeBuild 'auth-api'
 includeBuild 'rent-api'
+includeBuild 'search-api'
+
 
 
 includeBuild 'gateway-api'
