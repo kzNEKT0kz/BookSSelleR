@@ -26,11 +26,11 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false     # отключаем авторизацию
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g       # настройки JVM
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
-      - "9200:9200"                      # API Elasticsearch
-      - "9300:9300"                      # внутренний кластерный порт
+      - "9200:9200"
+      - "9300:9300"
     volumes:
       - elastic-data:/usr/share/elasticsearch/data
     networks:
@@ -43,9 +43,9 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - SERVER_NAME=kibana
-      - XPACK_SECURITY_ENABLED=false     # отключаем авторизацию
+      - XPACK_SECURITY_ENABLED=false
     ports:
-      - "5601:5601"                      # веб-интерфейс Kibana
+      - "5601:5601"
     depends_on:
       - elasticsearch
     networks:

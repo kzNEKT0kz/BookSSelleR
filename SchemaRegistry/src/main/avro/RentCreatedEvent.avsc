@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "name": "RentCreatedEvent",
+  "namespace": "com.smart.library.eventschemas.avro",
+  "fields": [
+    {"name": "id", "type": "long"},
+    {"name": "userid", "type": "string"},
+    {"name": "bookid", "type": "string"}
+  ]
+}

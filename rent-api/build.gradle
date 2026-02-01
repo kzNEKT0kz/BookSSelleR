@@ -16,17 +16,28 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url "https://packages.confluent.io/maven/" }
+
 }
 
 ext {
 	set('springCloudVersion', "2025.1.0")
-	maven { url "https://packages.confluent.io/maven/" }
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+	implementation 'ru.javabegin.micro.BookSSelleR:SchemaRegistry:0.0.1-SNAPSHOT'
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.apache.avro:avro:1.11.3'
+	implementation 'io.confluent:kafka-avro-serializer:7.6.1'
+
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

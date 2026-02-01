@@ -30,7 +30,7 @@ public class CategoryService {
     private String categoryCreatedEventTopicName;
 
     @Transactional
-    public Category create(Category category) {
+    public void create(Category category) {
 
 
         if(categoryRepository.findByName(category.getName()).isPresent()) {
@@ -62,7 +62,7 @@ public class CategoryService {
             log.error("Error sending Kafka message for category ID: {}", savedCategory.getId(), e);
         }
 
-        return savedCategory;
+         categoryRepository.save(savedCategory);
 
     }
 
