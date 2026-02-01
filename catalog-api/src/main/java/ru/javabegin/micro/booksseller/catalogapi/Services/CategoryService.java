@@ -55,6 +55,7 @@ public class CategoryService {
                             log.info("Category created event sent successfully. ID: {}", savedCategory.getId());
                         } else {
                             log.error("Failed to send category created event. ID: {}", savedCategory.getId(), ex);
+                            throw new IllegalArgumentException("Failed to send category created event. ID: " + savedCategory.getId(), ex);
                         }
                     });
         } catch (Exception e) {
