@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "InventoryCreatedEvent",
+  "namespace": "com.smart.library.eventschemas.avro",
+  "fields": [
+    {"name": "bookID", "type": "string"},
+    {"name": "bookName", "type": "string"},
+    {"name": "author", "type": "string"},
+    {"name": "genre", "type": "string"},
+    {"name": "language", "type": "string"},
+    {"name": "publisher", "type": "string"}
+
+  ]
+}

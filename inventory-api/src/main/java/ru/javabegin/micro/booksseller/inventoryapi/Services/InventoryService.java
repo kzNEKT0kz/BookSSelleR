@@ -25,6 +25,8 @@ public class InventoryService {
              throw new  IllegalArgumentException("Genre does not exist");
         }
 
+
+
          inventoryRepository.save(book);
 
     }

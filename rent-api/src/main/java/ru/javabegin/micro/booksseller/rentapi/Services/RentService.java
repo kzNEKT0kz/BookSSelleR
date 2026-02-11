@@ -1,7 +1,6 @@
 package ru.javabegin.micro.booksseller.rentapi.Services;
 
 
-import com.smart.library.eventschemas.avro.RentCreatedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,7 @@ public class RentService {
                 .setId(Long.parseLong(savedRent.getId()))
                 .setUserid(savedRent.getUserId())
                 .setBookid(savedRent.getBookId())
+                .setQuantity(savedRent.getQuantity())
 
 
                 .build();
