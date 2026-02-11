@@ -15,6 +15,7 @@ java {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url "https://packages.confluent.io/maven/" }
 }
@@ -30,7 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 
-
+    implementation 'ru.javabegin.micro.BookSSelleR:SchemaRegistry:0.0.1-SNAPSHOT'
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.apache.avro:avro:1.11.3'
     implementation 'io.confluent:kafka-avro-serializer:7.6.1'

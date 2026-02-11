@@ -67,4 +67,17 @@ public class InventoryService {
 
 
 
+    public void DecreaseStock(String id, int amount) {
+
+        if(inventoryRepository.existsById(id)){
+
+            Book book = inventoryRepository.findById(id).get();
+            book.setStockQuantity(book.getStockQuantity() - amount);
+            inventoryRepository.save(book);
+        }
+        else throw new IllegalArgumentException("Book not found");
+    }
+
+
+
 }
