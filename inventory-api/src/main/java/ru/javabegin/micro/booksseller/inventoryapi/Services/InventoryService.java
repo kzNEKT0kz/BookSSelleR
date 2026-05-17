@@ -23,6 +23,9 @@ public class InventoryService {
         if(!CheckExistCategory(book.getGenre())){
              throw new  IllegalArgumentException("Genre does not exist");
         }
+
+
+
          inventoryRepository.save(book);
     }
 
