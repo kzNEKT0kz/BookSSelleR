@@ -21,14 +21,9 @@ public class InventoryService {
     public void addBook(Book book) {
 
         if(!CheckExistCategory(book.getGenre())){
-
              throw new  IllegalArgumentException("Genre does not exist");
         }
-
-
-
          inventoryRepository.save(book);
-
     }
 
     public void removeBook(String id) {
@@ -54,6 +49,67 @@ public class InventoryService {
         throw new IllegalArgumentException("Book not found");
     }
 
+
+    public void DecreaseStockBooks (String id, int amount) {
+        if(inventoryRepository.existsById(id)){
+            Book book = inventoryRepository.findById(id).get();
+            if(book.getStockQuantity() >= amount){
+                book.setStockQuantity(book.getStockQuantity() - amount);
+            }
+        }
+    }
+
+
+
+
+    public void RentBooks(String id, int amount) {
+
+        if(inventoryRepository.existsById(id)){
+
+
+            Book book = inventoryRepository.findById(id).get();
+            if(book.getFreeQuantity() > amount){
+                book.setFreeQuantity(book.getFreeQuantity() - amount);
+                book.setRentedQuantity(book.getRentedQuantity() + amount);
+                inventoryRepository.save(book);
+            }
+            else throw new IllegalArgumentException("Out of stock");
+
+        }
+        else throw new IllegalArgumentException("Book not found");
+    }
+
+    public void ReturnRentBooks(String id, int amount) {
+        if(inventoryRepository.existsById(id)){
+            Book book = inventoryRepository.findById(id).get();
+            book.setRentedQuantity(book.getRentedQuantity() - amount);
+            book.setFreeQuantity(book.getFreeQuantity() + amount);
+
+
+            inventoryRepository.save(book);
+        }
+        else throw new IllegalArgumentException("Book not found");
+    }
+
+    public void BookedBooks(String id, int amount) {
+        if(inventoryRepository.existsById(id)){
+            Book book = inventoryRepository.findById(id).get();
+            book.setFreeQuantity(book.getFreeQuantity() - amount);
+            book.setBookedQuantity(book.getBookedQuantity() + amount);
+        }
+        else throw new IllegalArgumentException("Book not found");
+    }
+
+    public void ReturnBookedBooks(String id, int amount) {
+        if(inventoryRepository.existsById(id)){
+            Book book = inventoryRepository.findById(id).get();
+            book.setFreeQuantity(book.getFreeQuantity() - amount);
+            book.setBookedQuantity(book.getBookedQuantity() + amount);
+        }
+        else throw new IllegalArgumentException("Book not found");
+    }
+
+
     public List<Book> getAllBooks() {
         return inventoryRepository.findAll();
     }
@@ -61,24 +117,22 @@ public class InventoryService {
 
     public boolean CheckExistCategory(String category) {
 
-        if(categoryRepository.findByName(category)){
-            return true;
-        }
-        return false;
+        return categoryRepository.findByName(category);
     }
 
 
-
-    public void DecreaseStock(String id, int amount) {
-
+    public void AddToFreeBook(String id, int amount) {
         if(inventoryRepository.existsById(id)){
-
             Book book = inventoryRepository.findById(id).get();
-            book.setStockQuantity(book.getStockQuantity() - amount);
-            inventoryRepository.save(book);
+            book.setFreeQuantity(book.getFreeQuantity() + amount);
         }
-        else throw new IllegalArgumentException("Book not found");
     }
+
+
+
+
+
+
 
 
 

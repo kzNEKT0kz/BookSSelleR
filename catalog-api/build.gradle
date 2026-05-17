@@ -29,9 +29,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    implementation 'ru.javabegin.micro.BookSSelleR:SchemaRegistry:0.0.1-SNAPSHOT'
+    implementation 'ru.javabegin.micro:event-contracts:0.0.1-SNAPSHOT'
+
     implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'org.apache.avro:avro:1.11.3'
     implementation 'io.confluent:kafka-avro-serializer:7.6.1'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

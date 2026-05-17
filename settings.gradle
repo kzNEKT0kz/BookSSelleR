@@ -13,4 +13,4 @@ includeBuild 'search-api'
 
 includeBuild 'gateway-api'
 
-includeBuild 'SchemaRegistry'
+includeBuild 'event-contracts'

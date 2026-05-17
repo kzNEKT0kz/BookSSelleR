@@ -1,6 +1,8 @@
 package ru.javabegin.micro.booksseller.rentapi.Services;
 
 
+import com.smart.library.eventschemas.avro.RentReturnRecord;
+import com.smart.library.eventschemas.avro.RentRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -11,20 +13,26 @@ import ru.javabegin.micro.booksseller.rentapi.Repository.RentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 @Service
 public class RentService {
 
     private static final Logger log = LoggerFactory.getLogger(RentService.class);
     private final RentRepository rentRepository;
-    private final KafkaTemplate<String, RentCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, RentRecord> kafkaRentTemplate;
+    private final KafkaTemplate<String, RentReturnRecord> kafkaRentReturnTemplate;
 
-    public RentService(RentRepository rentRepository, KafkaTemplate<String, RentCreatedEvent> kafkaTemplate) {
+    public RentService(RentRepository rentRepository, KafkaTemplate<String, RentRecord> kafkaRentTemplate, KafkaTemplate<String, RentReturnRecord> kafkaRentReturnTemplate) {
         this.rentRepository = rentRepository;
-        this.kafkaTemplate = kafkaTemplate;
+        this.kafkaRentTemplate = kafkaRentTemplate;
+        this.kafkaRentReturnTemplate = kafkaRentReturnTemplate;
     }
 
-    @Value("${category.created.event.topic.name}")
-    private String categoryCreatedEventTopic;
+    @Value("${rent.created.event.topic.name}")
+    private String rentCreatedEventTopic;
+
+    @Value("${rent.status.event.topic.name}")
+    private String rentReturnEventTopic;
 
 
     @Transactional
@@ -36,17 +44,17 @@ public class RentService {
 
         Rent savedRent = rentRepository.save(rent);
 
-        RentCreatedEvent event = RentCreatedEvent.newBuilder()
-                .setId(Long.parseLong(savedRent.getId()))
-                .setUserid(savedRent.getUserId())
-                .setBookid(savedRent.getBookId())
-                .setQuantity(savedRent.getQuantity())
 
+
+        RentRecord event = RentRecord.newBuilder()
+                .setRecordId(Long.parseLong(savedRent.getId()))
+                .setBookID(savedRent.getBookId())
+                .setQuantity(savedRent.getQuantity())
 
                 .build();
 
         try {
-            kafkaTemplate.send(categoryCreatedEventTopic, event)
+            kafkaRentTemplate.send(rentCreatedEventTopic, event)
                     .whenComplete((result, ex) -> {
                         if(ex == null) {
                             log.info("Rent created successfully. ID: {}", savedRent.getId());
@@ -56,13 +64,49 @@ public class RentService {
                             throw new IllegalArgumentException("Rent creation failed. ID: " + savedRent.getId());
                         }
                     });
-            } catch (Exception e) {
+        } catch (Exception e) {
             log.error("Rent creation failed. ID: {}", savedRent.getId());
 
         }
 
         rentRepository.save(savedRent);
+    }
 
+
+    @Transactional
+    public void cancelRent(Rent rent) {
+
+
+        //Сюда должен приходить не Rent а DTO с RecordID, BookID, Quantity
+
+
+
+        if(rent.getUserId() == null && rent.getBookId() == null && rent.getQuantity() == null) {
+            throw new IllegalArgumentException("Must specify either userId or bookId");
+        }
+
+        Rent savedRent = rentRepository.save(rent);
+
+        RentReturnRecord event = RentReturnRecord.newBuilder()
+                .setRecordId(Long.parseLong(savedRent.getId()))
+                .setBookID(savedRent.getBookId())
+                .setQuantity(savedRent.getQuantity())
+                .build();
+
+        try {
+            kafkaRentReturnTemplate.send(rentReturnEventTopic, event)
+                    .whenComplete((result, ex) -> {
+                        if(ex == null) {
+                            log.info("Rent cancelled successfully. ID: {}", rent.getId());
+                        }
+                        else {
+                            log.error("Failed to send rent cancelled event. ID: {}", rent.getId(), ex);
+                        }
+                    });
+        } catch (Exception e) {
+            log.error("Rent cancel failed. ID: {}", rent.getId());
+        }
+        rentRepository.save(rent);
 
     }
 
@@ -72,10 +116,6 @@ public class RentService {
     }
 
 
-    @Transactional
-    public void deleteRent(String id) {
-        rentRepository.deleteById(id);
-    }
 
 
 }

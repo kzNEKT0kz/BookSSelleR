@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id "com.github.davidmc24.gradle.plugin.avro" version "1.9.1"
+}
+
+group = 'ru.javabegin.micro'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://packages.confluent.io/maven/"
+    }
+}
+
+dependencies {
+    implementation 'org.apache.avro:avro:1.11.3'
+}
+
+avro {
+    stringType = "String"
+    fieldVisibility = "PRIVATE"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}

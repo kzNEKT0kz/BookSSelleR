@@ -22,7 +22,14 @@ public class Book {
 
     private Integer rentedQuantity;
 
+    private Integer bookedQuantity;
+
+    private Integer availableQuantity;
+
+    private Integer price;
+
     private String description;
+
 
     private String subtitle;
 
@@ -45,6 +52,29 @@ public class Book {
 
     private String  series;
 
+    public Integer getBookedQuantity() {
+        return bookedQuantity;
+    }
+
+    public void setBookedQuantity(Integer bookedQuantity) {
+        this.bookedQuantity = bookedQuantity;
+    }
+
+    public Integer getFreeQuantity() {
+        return availableQuantity;
+    }
+
+    public void setFreeQuantity(Integer freeQuantity) {
+        this.availableQuantity = freeQuantity;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
 
     public String getId() {
         return id;

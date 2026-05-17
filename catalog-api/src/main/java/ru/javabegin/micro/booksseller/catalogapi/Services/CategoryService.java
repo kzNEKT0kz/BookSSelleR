@@ -61,6 +61,7 @@ public class CategoryService {
                     });
         } catch (Exception e) {
             log.error("Error sending Kafka message for category ID: {}", savedCategory.getId(), e);
+            delete(savedCategory.getId());
         }
 
          categoryRepository.save(savedCategory);
