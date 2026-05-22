@@ -8,7 +8,10 @@
 		{"name": "author", "type": "string"},
 		{"name": "genre", "type": "string"},
 		{"name": "language", "type": "string"},
-		{"name": "publisher", "type": "string"}
+		{"name": "publisher", "type": "string"},
+		{"name": "price", "type": "int"}
+
+
 
 	]
 }
