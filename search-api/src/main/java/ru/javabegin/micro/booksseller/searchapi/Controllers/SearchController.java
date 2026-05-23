@@ -44,15 +44,29 @@ public class SearchController {
             Integer minPrice,
 
             @RequestParam(required = false)
-            Integer maxPrice
+            Integer maxPrice,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size
+
     ) {
+        size = Math.min(size, 50);
+        size = Math.max(size, 1);
+
+        page = Math.max(page, 0);
+        page = Math.min(page, 100);
 
         return searchService.advancedSearch(
                 query,
                 genre,
                 language,
                 minPrice,
-                maxPrice
+                maxPrice,
+                page,
+                size
         );
     }
 

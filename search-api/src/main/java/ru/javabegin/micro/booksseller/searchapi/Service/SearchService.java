@@ -1,6 +1,8 @@
 package ru.javabegin.micro.booksseller.searchapi.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -16,6 +18,8 @@ public class SearchService {
 
     private final ElasticsearchOperations operations;
 
+
+    @Cacheable(value = "book-search", key = "#query")
     public List<BookDocument> search(String query) {
 
         NativeQuery searchQuery = NativeQuery.builder()
@@ -61,14 +65,37 @@ public class SearchService {
 
     }
 
+    @Cacheable(
+            value = "book-search",
+            key =
+                    "T(java.util.Objects).toString(#query,'')"
+                            + " + '-' + "
+                            + "T(java.util.Objects).toString(#genre,'')"
+                            + " + '-' + "
+                            + "T(java.util.Objects).toString(#language,'')"
+                            + " + '-' + "
+                            + "T(java.util.Objects).toString(#minPrice,'')"
+                            + " + '-' + "
+                            + "T(java.util.Objects).toString(#maxPrice,'')"
+                            + " + '-' + "
+                            + "#page"
+                            + " + '-' + "
+                            + "#size"
+    )
 
     public List<BookDocument> advancedSearch(
+
+
             String query,
             String genre,
             String language,
             Integer minPrice,
-            Integer maxPrice
+            Integer maxPrice,
+            Integer page,
+            Integer size
     ) {
+
+        System.out.println("ELASTICSEARCH HIT");
 
         NativeQuery searchQuery = NativeQuery.builder()
                 .withQuery(q -> q
@@ -129,6 +156,7 @@ public class SearchService {
                             return b;
                         })
                 )
+                .withPageable(PageRequest.of(page, size))
                 .build();
 
         SearchHits<BookDocument> searchHits =
