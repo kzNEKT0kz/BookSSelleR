@@ -14,40 +14,61 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtTokenFilter
+        extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtTokenFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtTokenFilter(
+            JwtTokenProvider jwtTokenProvider
+    ) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        String authHeader =
+                request.getHeader("Authorization");
+
+        if (authHeader != null
+                && authHeader.startsWith("Bearer ")) {
+
+            String token =
+                    authHeader.substring(7);
 
             if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getEmailFromToken(token);
-                String role = jwtTokenProvider.getRoleFromToken(token);
-                String userType = jwtTokenProvider.getUserTypeFromToken(token);
 
-                UsernamePasswordAuthenticationToken authentication =
+                Long userId =
+                        jwtTokenProvider
+                                .getUserId(token);
+
+                String role =
+                        jwtTokenProvider
+                                .getRole(token);
+
+                UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
-                                email,
+                                userId,
                                 null,
-                                List.of(new SimpleGrantedAuthority(role))
+                                List.of(
+                                        new SimpleGrantedAuthority(role)
+                                )
                         );
 
-                authentication.setDetails(userType);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(auth);
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(
+                request,
+                response
+        );
     }
 }

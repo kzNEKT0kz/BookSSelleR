@@ -2,9 +2,11 @@ package ru.javabegin.micro.booksseller.authapi.Security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -18,39 +20,79 @@ public class JwtTokenProvider {
     private String secret;
 
     @Value("${jwt.expiration}")
-    private int expiration;
+    private long expiration;
 
-    public String generateToken(String email, String role, String userType) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
-        claims.put("userType", userType);
+    public String generateToken(
+            Long userId,
+            String email,
+            String role
+    ) {
 
         return Jwts.builder()
                 .subject(email)
-                .claims(claims)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey(), Jwts.SIG.HS256)
+                .claim("userId", userId)
+                .claim("role", role)
+                .issuedAt(new Date())
+                .expiration(
+                        new Date(
+                                System.currentTimeMillis()
+                                        + expiration
+                        )
+                )
+                .signWith(
+                        getSigningKey(),
+                        Jwts.SIG.HS256
+                )
                 .compact();
     }
 
-    private SecretKeySpec getSigningKey() {
-        return new SecretKeySpec(this.secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+    public Long getUserId(String token) {
+
+        Object value =
+                getClaims(token).get("userId");
+
+        if (value instanceof Integer i) {
+            return i.longValue();
+        }
+
+        if (value instanceof Long l) {
+            return l;
+        }
+
+        return Long.parseLong(value.toString());
     }
 
-    public String getEmailFromToken(String token) {
-        return getAllClaimsFromToken(token).getSubject();
+    public String getRole(String token) {
+
+        return getClaims(token)
+                .get("role", String.class);
     }
 
-    public String getRoleFromToken(String token) {
-        return getAllClaimsFromToken(token).get("role", String.class);
+    public String getEmail(String token) {
+
+        return getClaims(token)
+                .getSubject();
     }
 
-    public String getUserTypeFromToken(String token) {
-        return getAllClaimsFromToken(token).get("userType", String.class);
+    public boolean validateToken(String token) {
+
+        try {
+
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
+
+            return true;
+
+        } catch (Exception ex) {
+
+            return false;
+        }
     }
 
-    private Claims getAllClaimsFromToken(String token) {
+    private Claims getClaims(String token) {
+
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -58,15 +100,10 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    private SecretKey getSigningKey() {
+
+        return Keys.hmacShaKeyFor(
+                secret.getBytes(StandardCharsets.UTF_8)
+        );
     }
 }
