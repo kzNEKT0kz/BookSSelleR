@@ -1,17 +1,16 @@
 package ru.javabegin.micro.booksseller.authapi.Security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Component
 public class JwtTokenProvider {
@@ -25,31 +24,22 @@ public class JwtTokenProvider {
     public String generateToken(
             Long userId,
             String email,
-            String role
+            List<String> roles
     ) {
 
         return Jwts.builder()
                 .subject(email)
                 .claim("userId", userId)
-                .claim("role", role)
+                .claim("roles", roles)
                 .issuedAt(new Date())
-                .expiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + expiration
-                        )
-                )
-                .signWith(
-                        getSigningKey(),
-                        Jwts.SIG.HS256
-                )
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
     public Long getUserId(String token) {
 
-        Object value =
-                getClaims(token).get("userId");
+        Object value = getClaims(token).get("userId");
 
         if (value instanceof Integer i) {
             return i.longValue();
@@ -62,16 +52,16 @@ public class JwtTokenProvider {
         return Long.parseLong(value.toString());
     }
 
-    public String getRole(String token) {
+    @SuppressWarnings("unchecked")
+    public List<String> getRoles(String token) {
 
         return getClaims(token)
-                .get("role", String.class);
+                .get("roles", List.class);
     }
 
     public String getEmail(String token) {
 
-        return getClaims(token)
-                .getSubject();
+        return getClaims(token).getSubject();
     }
 
     public boolean validateToken(String token) {
@@ -85,7 +75,9 @@ public class JwtTokenProvider {
 
             return true;
 
-        } catch (Exception ex) {
+        } catch (SecurityException |
+                 JwtException |
+                 IllegalArgumentException ex) {
 
             return false;
         }
@@ -106,4 +98,5 @@ public class JwtTokenProvider {
                 secret.getBytes(StandardCharsets.UTF_8)
         );
     }
+
 }

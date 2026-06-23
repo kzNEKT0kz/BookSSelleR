@@ -37,13 +37,6 @@ public class User {
 
     private Float totalSpendAmount;
 
-    private String provider;
-
-    private String providerId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
-    private Role role;
 }
 
 

@@ -14,7 +14,8 @@ import ru.javabegin.micro.booksseller.authapi.Repositories.RoleRepository;
 import ru.javabegin.micro.booksseller.authapi.Repositories.UserRepository;
 import ru.javabegin.micro.booksseller.authapi.Security.JwtTokenProvider;
 
-import java.util.Optional;
+import java.util.List;
+
 
 @Service
 @Transactional(readOnly = true)
@@ -45,17 +46,7 @@ public class AuthService {
             RegistrationRequest request
     ) {
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent()
-                || adminRepository.findByEmail(request.getEmail()).isPresent()) {
-
-            throw new IllegalArgumentException(
-                    "Email already exists"
-            );
-        }
-
-        Role role = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() ->
-                        new RuntimeException("ROLE_USER not found"));
+        checkEmail(request.getEmail());
 
         User user = new User();
 
@@ -63,33 +54,28 @@ public class AuthService {
         user.setEmail(request.getEmail());
 
         user.setPassword(
-                passwordEncoder.encode(
-                        request.getPassword()
-                )
+                passwordEncoder.encode(request.getPassword())
         );
 
         user.setBirth(request.getBirth());
         user.setAge(request.getAge());
-
         user.setTotalSpendAmount(0f);
 
-        user.setProvider("LOCAL");
-
-        user.setRole(role);
-
         user = userRepository.save(user);
+
+        List<String> roles = List.of("ROLE_USER");
 
         String token = jwtTokenProvider.generateToken(
                 user.getId(),
                 user.getEmail(),
-                role.getName()
+                roles
         );
 
         return new AuthorizationResponse(
                 token,
                 user.getId(),
                 user.getEmail(),
-                role.getName()
+                roles
         );
     }
 
@@ -98,17 +84,7 @@ public class AuthService {
             RegistrationRequest request
     ) {
 
-        if (adminRepository.findByEmail(request.getEmail()).isPresent()
-                || userRepository.findByEmail(request.getEmail()).isPresent()) {
-
-            throw new IllegalArgumentException(
-                    "Email already exists"
-            );
-        }
-
-        Role role = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() ->
-                        new RuntimeException("ROLE_ADMIN not found"));
+        checkEmail(request.getEmail());
 
         Admin admin = new Admin();
 
@@ -117,28 +93,36 @@ public class AuthService {
         admin.setEmail(request.getEmail());
 
         admin.setPassword(
-                passwordEncoder.encode(
-                        request.getPassword()
-                )
+                passwordEncoder.encode(request.getPassword())
         );
 
-        admin.setProvider("LOCAL");
+        Role role = roleRepository
+                .findByName("ROLE_ADMIN")
+                .orElseThrow(() ->
+                        new IllegalArgumentException("ROLE_ADMIN not found"));
 
-        admin.setRole(role);
+        admin.getRoles().add(role);
 
         admin = adminRepository.save(admin);
 
-        String token = jwtTokenProvider.generateToken(
-                admin.getId(),
-                admin.getEmail(),
-                role.getName()
-        );
+        List<String> roles =
+                admin.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .toList();
+
+        String token =
+                jwtTokenProvider.generateToken(
+                        admin.getId(),
+                        admin.getEmail(),
+                        roles
+                );
 
         return new AuthorizationResponse(
                 token,
                 admin.getId(),
                 admin.getEmail(),
-                role.getName()
+                roles
         );
     }
 
@@ -146,21 +130,10 @@ public class AuthService {
             AuthorizationRequest request
     ) {
 
-        User user = userRepository.findByEmail(
-                        request.getEmail()
-                )
+        User user = userRepository
+                .findByEmail(request.getEmail())
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "User not found"
-                        )
-                );
-
-        if (!"LOCAL".equals(user.getProvider())) {
-
-            throw new IllegalArgumentException(
-                    "Use OAuth2 login"
-            );
-        }
+                        new IllegalArgumentException("User not found"));
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
@@ -172,17 +145,20 @@ public class AuthService {
             );
         }
 
-        String token = jwtTokenProvider.generateToken(
-                user.getId(),
-                user.getEmail(),
-                user.getRole().getName()
-        );
+        List<String> roles = List.of("ROLE_USER");
+
+        String token =
+                jwtTokenProvider.generateToken(
+                        user.getId(),
+                        user.getEmail(),
+                        roles
+                );
 
         return new AuthorizationResponse(
                 token,
                 user.getId(),
                 user.getEmail(),
-                user.getRole().getName()
+                roles
         );
     }
 
@@ -190,14 +166,10 @@ public class AuthService {
             AuthorizationRequest request
     ) {
 
-        Admin admin = adminRepository.findByEmail(
-                        request.getEmail()
-                )
+        Admin admin = adminRepository
+                .findByEmail(request.getEmail())
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Admin not found"
-                        )
-                );
+                        new IllegalArgumentException("Admin not found"));
 
         if (!passwordEncoder.matches(
                 request.getPassword(),
@@ -209,18 +181,36 @@ public class AuthService {
             );
         }
 
-        String token = jwtTokenProvider.generateToken(
-                admin.getId(),
-                admin.getEmail(),
-                admin.getRole().getName()
-        );
+        List<String> roles =
+                admin.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .toList();
+
+        String token =
+                jwtTokenProvider.generateToken(
+                        admin.getId(),
+                        admin.getEmail(),
+                        roles
+                );
 
         return new AuthorizationResponse(
                 token,
                 admin.getId(),
                 admin.getEmail(),
-                admin.getRole().getName()
+                roles
         );
+    }
+
+    private void checkEmail(String email) {
+
+        if (userRepository.findByEmail(email).isPresent()
+                || adminRepository.findByEmail(email).isPresent()) {
+
+            throw new IllegalArgumentException(
+                    "Email already exists"
+            );
+        }
     }
 
 }

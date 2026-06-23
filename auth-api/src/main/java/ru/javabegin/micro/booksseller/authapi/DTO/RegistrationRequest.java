@@ -1,5 +1,7 @@
 package ru.javabegin.micro.booksseller.authapi.DTO;
 
+
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,8 @@ public class RegistrationRequest {
     private String name;
     private String email;
     private String password;
+    private String roles;
+
 
     private LocalDate birth;
     private Integer age;
