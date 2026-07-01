@@ -1,4 +1,4 @@
-package ru.javabegin.micro.booksseller.authapi.Security;
+package ru.javabegin.micro.booksseller.commonsecurity.Security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

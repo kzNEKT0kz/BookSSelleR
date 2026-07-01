@@ -3,16 +3,20 @@ package ru.javabegin.micro.booksseller.catalogapi.Services;
 
 import com.smart.library.eventschemas.avro.CategoryCreatedEvent;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import ru.javabegin.micro.booksseller.catalogapi.DTO.CategoryCreateRequest;
 import ru.javabegin.micro.booksseller.catalogapi.Entities.Category;
+import ru.javabegin.micro.booksseller.catalogapi.Mappers.CategoryMapper;
 import ru.javabegin.micro.booksseller.catalogapi.Repositories.CategoryRepository;
 
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
     private static final Logger log = LoggerFactory.getLogger(CategoryService.class);
@@ -20,25 +24,28 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final KafkaTemplate<String, CategoryCreatedEvent> kafkaTemplate;
 
-    public CategoryService(CategoryRepository categoryRepository,
-                           KafkaTemplate<String, CategoryCreatedEvent> kafkaTemplate) {
-        this.categoryRepository = categoryRepository;
-        this.kafkaTemplate = kafkaTemplate;
+    private final CategoryMapper categoryMapper;
+
+    public CategoryCreateRequest getCategory(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow();
+        return categoryMapper.toDto(category);
     }
 
     @Value("${category.created.event.topic.name}")
     private String categoryCreatedEventTopicName;
 
     @Transactional
-    public void create(Category category) {
+    public void create(CategoryCreateRequest categoryCreateRequest) {
 
-
-        if(categoryRepository.findByName(category.getName()).isPresent()) {
-            throw new IllegalStateException("Category with name " + category.getName() + " already exists");
+        if(categoryRepository.findByName(categoryCreateRequest.getName()).isPresent()) {
+            throw new IllegalStateException("Category with name " + categoryCreateRequest.getName() + " already exists");
         }
 
-        if (category.getName() == null || category.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Category name cannot be null or empty");
+        Category category = categoryMapper.toEntity(categoryCreateRequest);
+
+        if (categoryCreateRequest.getParent_id() != null) {
+            Category parent = categoryRepository.findById(categoryCreateRequest.getParent_id()).orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+            category.setParent(parent);
         }
 
         Category savedCategory = categoryRepository.save(category);
@@ -49,32 +56,22 @@ public class CategoryService {
                 .build();
 
         try {
-            kafkaTemplate.send(categoryCreatedEventTopicName, String.valueOf(savedCategory.getId()), event)
-                    .whenComplete((result, ex) -> {
-                        if (ex == null) {
-                            log.info("Category created event sent successfully. ID: {}", savedCategory.getId());
-                        } else {
-                            log.error("Failed to send category created event. ID: {}", savedCategory.getId(), ex);
-                            delete(savedCategory.getId());
-                            throw new IllegalArgumentException("Failed to send category created event. ID: " + savedCategory.getId(), ex);
-                        }
-                    });
+            kafkaTemplate.send(categoryCreatedEventTopicName, String.valueOf(savedCategory.getId()), event).get();
+
         } catch (Exception e) {
             log.error("Error sending Kafka message for category ID: {}", savedCategory.getId(), e);
-            delete(savedCategory.getId());
+
+            throw new RuntimeException("Failed to send Kafka message", e);
         }
-
-         categoryRepository.save(savedCategory);
-
     }
 
     @Transactional
     public void delete(Long id) {
-        if (categoryRepository.existsById(id)) {
-            categoryRepository.deleteById(id);
-            return;
+        if (!categoryRepository.existsById(id)) {
+            throw new IllegalStateException("Category already does not exist");
         }
-        throw new IllegalStateException("Category already does not exist");
+        categoryRepository.deleteById(id);
+
     }
 
     @Transactional

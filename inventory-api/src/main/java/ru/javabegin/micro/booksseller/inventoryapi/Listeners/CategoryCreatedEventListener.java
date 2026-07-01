@@ -20,6 +20,7 @@ public class CategoryCreatedEventListener {
    public void handlerCategoryCreated(CategoryCreatedEvent event) {
         Category category = new Category(String.valueOf(event.getId()),event.getCategoryName());
         categoryService.create(category);
+
     }
 
 

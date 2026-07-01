@@ -1,4 +1,5 @@
-package ru.javabegin.micro.booksseller.authapi.Configs;
+package ru.javabegin.micro.booksseller.catalogapi.Configs;
+
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -42,15 +43,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
-                                "/auth/register/**",
-                                "/auth/login/**",
-
-                                "/auth/test",
+                                "/catalog/test",
 
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
-                        )
+
+                                "/error",
+
+                                "/v3/api-docs/**")
+
 
                         .permitAll()
 

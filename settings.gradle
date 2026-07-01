@@ -1,16 +1,13 @@
 rootProject.name = 'BookSSelleR'
 
-
-includeBuild 'eureka-server'
-
-includeBuild 'catalog-api'
-includeBuild 'inventory-api'
-includeBuild 'auth-api'
-includeBuild 'rent-api'
-includeBuild 'search-api'
-
-
-
-includeBuild 'gateway-api'
-
-includeBuild 'event-contracts'
+include(
+        "eureka-server",
+        "catalog-api",
+        "inventory-api",
+        "auth-api",
+        "rent-api",
+        "search-api",
+        "common-security",
+        "gateway-api",
+        "event-contracts"
+)

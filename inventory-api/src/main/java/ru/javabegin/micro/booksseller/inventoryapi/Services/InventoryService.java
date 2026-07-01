@@ -55,19 +55,10 @@ public class InventoryService {
                 .build();
 
         try{
-            bookCreatedkafkaTemplate.send(inventoryRecordTopic, event)
-                    .whenComplete((result, ex) -> {
-                        if(ex == null) {
-                            log.info("Book created successfully. ID: {}", book.getId());
-                        }
-                        else {
-                            log.error("Failed to send book created event. ID: {}", book.getId());
-                            throw new IllegalArgumentException("Book creation failed. ID: " + book.getId());
-                        }
-                    });
+            bookCreatedkafkaTemplate.send(inventoryRecordTopic, event).get();
 
         }catch (Exception e){
-            log.error("Failed to send bookk created event. ID: {}", book.getId());
+            log.error("Failed to send book created event. ID: {}", book.getId());
         }
 
          inventoryRepository.save(book);
@@ -80,15 +71,8 @@ public class InventoryService {
                 .build();
 
         try{
-            bookDeleteKafkaTemplate.send(deleteBookRecordTopic, event)
-                    .whenComplete((result, ex) -> {
-                        if(ex == null) {
-                            log.info("Book deleted successfully. ID: {}", id);
-                        }
-                        else {
-                            log.error("Failed to delete book event. ID: {}", id);
-                        }
-                    });
+            bookDeleteKafkaTemplate.send(deleteBookRecordTopic, event).get();
+
         }catch (Exception e){
             log.error("Failed to delete book event. ID: {}", id);
         }

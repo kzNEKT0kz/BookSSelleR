@@ -1,6 +1,9 @@
 package ru.javabegin.micro.booksseller.catalogapi.Controllers;
 
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.javabegin.micro.booksseller.catalogapi.DTO.CategoryCreateRequest;
 import ru.javabegin.micro.booksseller.catalogapi.Entities.Category;
 import ru.javabegin.micro.booksseller.catalogapi.Services.CategoryService;
 
@@ -12,7 +15,8 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService) { this.categoryService = categoryService; }
 
     @PostMapping(path = "/addCatalog")
-    public void create(@RequestBody Category category){
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void create(@Valid @RequestBody CategoryCreateRequest category){
         categoryService.create(category);
     }
 

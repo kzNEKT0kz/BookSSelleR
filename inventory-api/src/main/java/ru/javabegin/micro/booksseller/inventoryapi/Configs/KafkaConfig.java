@@ -1,7 +1,7 @@
 package ru.javabegin.micro.booksseller.inventoryapi.Configs;
 
 
-import com.smart.library.eventschemas.avro.CategoryCreatedEvent;
+import com.smart.library.eventschemas.avro.DeleteBookEvent;
 import com.smart.library.eventschemas.avro.InventoryCreatedEvent;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
@@ -53,6 +53,22 @@ public class KafkaConfig {
     }
 
     @Bean
+    public ProducerFactory<String, DeleteBookEvent> deleteBookProducerFactory() {
+
+        Map<String, Object> props = new HashMap<>();
+
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
+        props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+        props.put(AbstractKafkaSchemaSerDeConfig.AUTO_REGISTER_SCHEMAS, true);
+
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+
+
+    @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
@@ -61,5 +77,13 @@ public class KafkaConfig {
     public KafkaTemplate<String, InventoryCreatedEvent> inventoryCreatedEventKafkaTemplate() {
         return new KafkaTemplate<>(inventoryEventProducerFactory());
     }
+
+    @Bean
+    public KafkaTemplate<String, DeleteBookEvent> deleteBookEventKafkaTemplate(){
+        return new KafkaTemplate<>(deleteBookProducerFactory());
+    }
+
+
+
 
 }

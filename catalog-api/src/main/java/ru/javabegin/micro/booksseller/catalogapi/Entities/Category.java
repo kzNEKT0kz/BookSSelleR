@@ -1,10 +1,14 @@
 package ru.javabegin.micro.booksseller.catalogapi.Entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "catalog")
 public class Category {
@@ -28,38 +32,6 @@ public class Category {
         this.id = id;
         this.name = name;
         this.parent = parent;
-        this.subcategory = subcategory;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Category getParent() {
-        return parent;
-    }
-
-    public void setParent(Category parent) {
-        this.parent = parent;
-    }
-
-    public List<Category> getSubcategory() {
-        return subcategory;
-    }
-
-    public void setSubcategory(List<Category> subcategory) {
         this.subcategory = subcategory;
     }
 
